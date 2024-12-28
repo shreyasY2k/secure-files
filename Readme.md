@@ -20,11 +20,14 @@ A secure file sharing platform built with Django, React, and Keycloak, featuring
 
 ## Project Structure
 
+```tree
 secure-files/
-├── backend/ # Django backend
-├── frontend/ # React frontend
-├── keycloak/ # Keycloak themes
-├── certs/ # SSL certificates (generated)
+├── backend/          # Django backend
+├── frontend/         # React frontend
+├── keycloak/         # Keycloak themes
+│   └── themes/
+│       └── secure-files/
+├── certs/            # SSL certificates (generated)
 ├── docker-compose.yaml
 ├── init-keycloak.sh
 └── README.md
@@ -32,7 +35,7 @@ secure-files/
 ## Quick Start
 
 1. Clone the repository:
-   git clone https://github.com/yourusername/secure-files.git
+   git clone https://github.com/shreyasY2k/secure-files
    cd secure-files
 
 2. Create necessary directories:
@@ -180,3 +183,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues and feature requests, please use the GitHub issue tracker.
+```
