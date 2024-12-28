@@ -31,14 +31,15 @@ class KeycloakAdmin:
             response = requests.post(
                 token_url,
                 data={
-                    'username': 'admin',  # Using admin username from settings
-                    'password': 'admin',  # Using admin password from settings
+                    'username': settings.KEYCLOAK_ADMIN_USER,  # Using admin user from settings
+                    'password': settings.KEYCLOAK_ADMIN_PASSWORD,  # Using admin password from settings
                     'grant_type': 'password',
                     'client_id': 'admin-cli'  # Using the built-in admin-cli client
                 },
                 headers={
                     'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                },
+                verify=False  # Disable SSL verification
             )
 
             if response.status_code != 200:
@@ -99,7 +100,8 @@ class KeycloakAdmin:
             response = requests.post(
                 f"{self.base_url}/users",
                 headers=headers,
-                json=user_payload
+                json=user_payload,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
 
@@ -109,7 +111,8 @@ class KeycloakAdmin:
             # Get role ID
             role_response = requests.get(
                 f"{self.base_url}/roles/{role}",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             role_response.raise_for_status()
             role_data = role_response.json()
@@ -122,7 +125,8 @@ class KeycloakAdmin:
             requests.post(
                 f"{self.base_url}/users/{user_id}/role-mappings/realm",
                 headers=headers,
-                json=role_assignment
+                json=role_assignment,
+                verify=False  # Disable SSL verification
             )
 
             return user_id
@@ -142,7 +146,8 @@ class KeycloakAdmin:
 
             response = requests.delete(
                 f"{self.base_url}/users/{user_id}",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             return True
@@ -162,7 +167,8 @@ class KeycloakAdmin:
 
             response = requests.get(
                 f"{self.base_url}/users?username={username}&exact=true",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             users = response.json()
@@ -184,7 +190,8 @@ class KeycloakAdmin:
 
             response = requests.get(
                 f"{self.base_url}/users",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             return response.json()
@@ -199,7 +206,8 @@ class KeycloakAdmin:
             headers = self._get_headers()
             response = requests.get(
                 f"{self.base_url}/users/count",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             return response.json()
@@ -229,7 +237,8 @@ class KeycloakAdmin:
             headers = self._get_headers()
             response = requests.get(
                 f"{self.base_url}/users/{user_id}",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             return response.json()
@@ -246,7 +255,8 @@ class KeycloakAdmin:
             response = requests.get(
                 f"{self.base_url}/users",
                 headers=headers,
-                params=params
+                params=params,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             users = response.json()
@@ -262,7 +272,8 @@ class KeycloakAdmin:
             headers = self._get_headers()
             response = requests.get(
                 f"{self.base_url}/users/{user_id}/role-mappings/realm",
-                headers=headers
+                headers=headers,
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             return response
@@ -277,7 +288,8 @@ class KeycloakAdmin:
             response = requests.put(
                 f"{self.base_url}/users/{user_id}",
                 headers=headers,
-                json={'enabled': enabled}
+                json={'enabled': enabled},
+                verify=False  # Disable SSL verification
             )
             response.raise_for_status()
             return True

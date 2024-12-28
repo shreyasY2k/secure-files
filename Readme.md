@@ -5,11 +5,11 @@ A secure file sharing platform built with Django, React, and Keycloak, featuring
 ## Features
 
 - 🔒 End-to-end file encryption
-- 🔑 Two-factor authentication (TOTP)
+- 🔑 Role-based authentication with Keycloak
 - 👥 User role management (Admin/User)
 - 🔗 Secure file sharing with expiry
 - 📊 File access analytics
-- 🛡️ HTTPS everywhere
+- 🛡️ Advanced access controls
 
 ## Prerequisites
 
@@ -24,152 +24,117 @@ A secure file sharing platform built with Django, React, and Keycloak, featuring
 secure-files/
 ├── backend/          # Django backend
 ├── frontend/         # React frontend
-├── keycloak/         # Keycloak themes
-│   └── themes/
-│       └── secure-files/
-├── certs/            # SSL certificates (generated)
-├── docker-compose.yaml
-├── init-keycloak.sh
+├── docker-compose.yml
+├── init-keycloak.sh  # Keycloak initialization script
 └── README.md
 ```
 
 ## Quick Start
 
 1. Clone the repository:
+   ```bash
    git clone https://github.com/shreyasY2k/secure-files
    cd secure-files
+   ```
 
-2. Create necessary directories:
-   mkdir -p backend frontend keycloak/themes/secure-files certs
+2. Start the services:
+   ```bash
+   docker-compose up --build
+   ```
+   This command will:
+   - Build and start all necessary containers
+   - Initialize Keycloak with default realms and users
+   - Set up the database
+   - Start the frontend and backend services
 
-3. Start the services:
-   docker-compose up -d
+3. Access the services:
+   - Frontend UI: http://localhost:3003
+   - Keycloak Admin Console: http://localhost:3001
+   - Backend API: http://localhost:3002
 
-4. Install the CA certificate:
+## Default Users
 
-   Windows (Run PowerShell as Administrator):
-   Import-Certificate -FilePath .\certs\ca.crt -CertStoreLocation Cert:\LocalMachine\Root
-
-   MacOS:
-   sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ./certs/ca.crt
-
-   Linux:
-   sudo cp ./certs/ca.crt /usr/local/share/ca-certificates/
-   sudo update-ca-certificates
-
-5. Access the services:
-   - Frontend: https://localhost:3003
-   - Backend API: https://localhost:3002
-   - Keycloak: https://localhost:3001
-
-## Default Credentials
+The system comes with two pre-configured users:
 
 ### Admin User
-
 - Username: admin
-- Password: admin123
-- Email: admin@securefile.local
+- Password: Admin@123456
+- Role: admin
 
 ### Regular User
-
 - Username: user
-- Password: user123
-- Email: user@securefile.local
+- Password: User@123456
+- Role: user
 
 ⚠️ Important: Change these credentials in production!
 
+## Keycloak Configuration
+- Admin Username: `admin`
+- Admin Password: 'CDEWSXZAQ!#'
+- Admin Console: http://localhost:3001
+
 ## Features in Detail
 
-### File Encryption
-
-- Files are encrypted before storage
-- Each file has a unique encryption key
-- Keys are securely managed
-
 ### User Authentication
-
-- Two-factor authentication using TOTP
+- Keycloak-based authentication
 - Role-based access control
-- Secure password policy enforcement
+- Secure session management
 
 ### File Sharing
-
 - Secure share links with expiry
 - Access count limits
 - Password protection option
 - User-to-user direct sharing
 
 ### Admin Features
-
 - User management
 - Storage quota management
 - Access statistics
 - System monitoring
 
-## Development
+## Development Components
 
 ### Backend (Django)
-
 - REST API with Django REST framework
 - PostgreSQL database
 - Secure file storage
 
 ### Frontend (React)
-
 - Modern React with Hooks
 - Tailwind CSS for styling
 - Real-time updates
 
 ### Security (Keycloak)
-
 - OAuth 2.0 / OpenID Connect
 - Role-based access control
-- Custom theme support
+- Customizable authentication flows
 
-## Environment Variables
+## Next Steps
 
-```shell
-Required environment variables in Docker Compose:
-KEYCLOAK_ADMIN: admin
-KEYCLOAK_ADMIN_PASSWORD: admin
-FRONTEND_URL: https://localhost:3003
-SECURE_FILES_ADMIN_USERNAME: admin
-SECURE_FILES_ADMIN_PASSWORD: admin123
-SECURE_FILES_USER_USERNAME: user
-SECURE_FILES_USER_PASSWORD: user123
-```
-
-## Production Deployment
-
-For production deployment:
-
-1. Change all default passwords
-2. Use proper SSL certificates
-3. Configure proper email settings
-4. Set secure password policies
-5. Enable email verification
-6. Configure backup strategy
-7. Set up monitoring
+### Adding SSL/HTTPS
+SSL/HTTPS support is planned for the next update. This will include:
+- Certificate generation
+- HTTPS configuration for all services
+- Secure cookie handling
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. Certificate Errors
+1. Keycloak Connection Issues
+   - Ensure all services are up: `docker-compose ps`
+   - Check Keycloak logs: `docker-compose logs keycloak`
+   - Wait for Keycloak initialization to complete
 
-   - Ensure CA certificate is properly installed
-   - Check certificate paths in docker-compose.yaml
-
-2. Keycloak Connection Issues
-
-   - Wait for Keycloak initialization
-   - Check if ports are free
-   - Verify Keycloak configuration
-
-3. File Upload Issues
+2. File Upload Issues
    - Check storage permissions
    - Verify file size limits
-   - Check encryption settings
+   - Check backend logs: `docker-compose logs backend`
+
+3. Authorization Issues
+   - Verify user roles in Keycloak admin console
+   - Check token configuration
+   - Clear browser cache and cookies
 
 ## Contributing
 
@@ -179,9 +144,6 @@ For production deployment:
 4. Push to the branch
 5. Create a Pull Request
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Support
 

@@ -101,6 +101,7 @@ const GuestView = () => {
             }
         } finally {
             setDownloading(false);
+            fetchFileInfo();
         }
     };
 

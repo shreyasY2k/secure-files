@@ -15,10 +15,10 @@ DEBUG = os.environ.get('DEBUG', '0').lower() in ['true', 't', '1']
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '').split()
 
 # Add SSL settings
-SECURE_SSL_REDIRECT = True
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# SECURE_SSL_REDIRECT = False
+# SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -128,6 +128,8 @@ for path in [STATIC_ROOT, MEDIA_ROOT, BASE_DIR / 'static', BASE_DIR / 'templates
 # Keycloak settings
 KEYCLOAK_URL = os.environ.get('KEYCLOAK_URL', 'http://keycloak:8080')
 KEYCLOAK_REALM = os.environ.get('KEYCLOAK_REALM', 'secure-files')
+KEYCLOAK_ADMIN_USER = os.environ.get('KEYCLOAK_ADMIN_USER', 'admin')
+KEYCLOAK_ADMIN_PASSWORD = os.environ.get('KEYCLOAK_ADMIN_PASSWORD', 'CDEWSXZAQ!#')
 
 # KEYCLOAK_CLIENT_ID = os.environ.get('KEYCLOAK_CLIENT_ID', 'secure-files-client')
 # KEYCLOAK_CLIENT_SECRET = os.environ.get('KEYCLOAK_CLIENT_SECRET', 'your-client-secret-here')

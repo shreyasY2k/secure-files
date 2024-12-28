@@ -16,11 +16,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    port: 443,
-    https: {
-      key: fs.readFileSync('/etc/certs/frontend.key'),
-      cert: fs.readFileSync('/etc/certs/frontend.crt'),
-    },
+    port: 3003,
   },
   build: {
     commonjsOptions: {
