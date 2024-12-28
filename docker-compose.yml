@@ -1,65 +1,4 @@
 services:
-  certgen:
-    image: alpine:latest
-    volumes:
-      - ./certs:/certs
-    command: >
-      /bin/sh -c "
-        if [ -f /certs/frontend.crt ] && [ -f /certs/backend.crt ] && [ -f /certs/keycloak.crt ]; then
-          echo 'Certificates already exist. Skipping generation.'
-          exit 0
-        fi
-
-        echo 'Generating new certificates...'
-        apk add --no-cache openssl &&
-        mkdir -p /certs &&
-        # Generate CA
-        openssl genpkey -algorithm RSA -out /certs/ca.key &&
-        openssl req -x509 -new -nodes -key /certs/ca.key -sha256 -days 1825 -out /certs/ca.crt -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' &&
-        
-        # Generate frontend cert
-        openssl genpkey -algorithm RSA -out /certs/frontend.key &&
-        echo '
-        [req]
-        distinguished_name = req_distinguished_name
-        req_extensions = v3_req
-        prompt = no
-
-        [req_distinguished_name]
-        C = US
-        ST = State
-        L = City
-        O = Organization
-        CN = localhost
-
-        [v3_req]
-        basicConstraints = CA:FALSE
-        keyUsage = digitalSignature, nonRepudiation, keyEncipherment
-        subjectAltName = @alt_names
-
-        [alt_names]
-        DNS.1 = localhost
-        DNS.2 = keycloak
-        DNS.3 = backend
-        DNS.4 = frontend
-        ' > /certs/frontend.conf &&
-        openssl req -new -key /certs/frontend.key -out /certs/frontend.csr -config /certs/frontend.conf &&
-        openssl x509 -req -in /certs/frontend.csr -CA /certs/ca.crt -CAkey /certs/ca.key -CAcreateserial -out /certs/frontend.crt -days 825 -sha256 -extensions v3_req -extfile /certs/frontend.conf &&
-        
-        # Generate backend cert using same config
-        openssl genpkey -algorithm RSA -out /certs/backend.key &&
-        openssl req -new -key /certs/backend.key -out /certs/backend.csr -config /certs/frontend.conf &&
-        openssl x509 -req -in /certs/backend.csr -CA /certs/ca.crt -CAkey /certs/ca.key -CAcreateserial -out /certs/backend.crt -days 825 -sha256 -extensions v3_req -extfile /certs/frontend.conf &&
-        
-        # Generate keycloak cert using same config
-        openssl genpkey -algorithm RSA -out /certs/keycloak.key &&
-        openssl req -new -key /certs/keycloak.key -out /certs/keycloak.csr -config /certs/frontend.conf &&
-        openssl x509 -req -in /certs/keycloak.csr -CA /certs/ca.crt -CAkey /certs/ca.key -CAcreateserial -out /certs/keycloak.crt -days 825 -sha256 -extensions v3_req -extfile /certs/frontend.conf &&
-        
-        chmod 644 /certs/*.crt /certs/*.key &&
-        echo 'New certificates generated successfully'
-      "
-
   frontend:
     build: ./frontend
     ports:
@@ -67,12 +6,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-      - ./certs:/etc/certs:ro
     env_file:
       - frontend.env
-    depends_on:
-      certgen:
-        condition: service_completed_successfully
 
   backend:
     build: ./backend
@@ -82,15 +17,8 @@ services:
       - ./backend:/app
       - file-storage:/app/storage
       - log-storage:/app/logs
-      - ./certs:/etc/certs:ro
-      - ./certs/ca.crt:/usr/local/share/ca-certificates/ca.crt:ro
-    environment:
-      - REQUESTS_CA_BUNDLE=/usr/local/share/ca-certificates/ca.crt
     env_file:
       - backend.env
-    depends_on:
-      certgen:
-        condition: service_completed_successfully
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0.2
@@ -101,10 +29,7 @@ services:
       - keycloak.env
     volumes:
       - ./keycloak/themes/secure-files:/opt/keycloak/themes/secure-files:ro
-      - ./certs:/etc/certs:ro
     depends_on:
-      certgen:
-        condition: service_completed_successfully
       db:
         condition: service_started
     
