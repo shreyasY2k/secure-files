@@ -31,6 +31,7 @@ secure-files/
 ├── docker-compose.yaml
 ├── init-keycloak.sh
 └── README.md
+```
 
 ## Quick Start
 
@@ -183,4 +184,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues and feature requests, please use the GitHub issue tracker.
+
+```
+
 ```
