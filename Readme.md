@@ -128,6 +128,7 @@ secure-files/
 
 ## Environment Variables
 
+```shell
 Required environment variables in Docker Compose:
 KEYCLOAK_ADMIN: admin
 KEYCLOAK_ADMIN_PASSWORD: admin
@@ -136,6 +137,7 @@ SECURE_FILES_ADMIN_USERNAME: admin
 SECURE_FILES_ADMIN_PASSWORD: admin123
 SECURE_FILES_USER_USERNAME: user
 SECURE_FILES_USER_PASSWORD: user123
+```
 
 ## Production Deployment
 
@@ -184,7 +186,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Support
 
 For issues and feature requests, please use the GitHub issue tracker.
-
-```
-
-```
