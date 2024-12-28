@@ -36,8 +36,17 @@ Human oversight and validation were maintained throughout the development proces
 secure-files/
 ├── backend/          # Django backend
 ├── frontend/         # React frontend
+├── keycloak/         # Keycloak configuration
 ├── docker-compose.yml
-├── init-keycloak.sh  # Keycloak initialization script
+├── backend.env
+├── frontend.env
+├── keycloak.env
+├── db.env
+|── init_keycloak.py
+|── keycloak-init.Dockerfile
+|── requirements-init.txt
+|── realm-config.json
+├── .gitignore
 └── README.md
 ```
 
