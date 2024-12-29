@@ -56,11 +56,12 @@ keycloak/themes/*
 keycloak/*.log
 
 # Docker & Certs
-certs/
 .docker/
 postgres_data/
 file-storage/
 log-storage/
+# certs directory should be there only the contents should be ignored
+certs/*
 
 # IDE and Editor files
 .idea/
@@ -75,3 +76,4 @@ venv/
 !frontend/.gitkeep
 !backend/.gitkeep
 !keycloak/.gitkeep
+!certs/.gitkeep
