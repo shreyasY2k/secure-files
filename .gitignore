@@ -77,3 +77,4 @@ venv/
 !backend/.gitkeep
 !keycloak/.gitkeep
 !certs/.gitkeep
+!certs/certificate.conf
