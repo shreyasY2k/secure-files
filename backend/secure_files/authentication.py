@@ -62,6 +62,10 @@ class KeycloakAuthentication(authentication.BaseAuthentication):
         if not auth_header:
             return None
 
+        # Skip Keycloak validation for share link downloads
+        if request.path.startswith('/api/files/download/'):
+            return None
+
         try:
             auth_parts = auth_header.split(' ')
             if len(auth_parts) != 2 or auth_parts[0].lower() != 'bearer':

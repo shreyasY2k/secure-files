@@ -249,35 +249,65 @@ class ShareLink(models.Model):
 
     def generate_access_token(self):
         """Generate a temporary access token after password verification"""
-        if not self.is_valid():
-            raise ValidationError("Share link is no longer valid")
-        
-        # Generate token
-        access_token = hashlib.sha256(
-            f"{self.token}{timezone.now().timestamp()}".encode('utf-8')
-        ).hexdigest()
-        
-        access_token = jwt.encode(
-            {'token': access_token},
-            settings.SECRET_KEY,
-            algorithm='RS256'
-        )
-        logging.info(f"Generated access token: {access_token}")
-        # Store in cache for 1 hour
-        cache_key = f"share_link_access_{self.token}"
-        cache.set(cache_key, access_token, timeout=3600)  # 1 hour
-        
-        return access_token
+        try:
+            if not self.is_valid():
+                raise ValidationError("Share link is no longer valid")
+
+            # Generate token with payload
+            payload = {
+                'share_link_id': str(self.id),
+                'token': str(self.token),
+                'exp': int((timezone.now() + timezone.timedelta(hours=1)).timestamp()),
+                'iat': int(timezone.now().timestamp())
+            }
+
+            # Create a simple secret by hashing the settings.SECRET_KEY
+            # This ensures we have a suitable key for HMAC
+            secret = hashlib.sha256(settings.SECRET_KEY.encode('utf-8')).hexdigest()
+
+            access_token = jwt.encode(
+                payload,
+                secret,
+                algorithm='HS256'
+            )
+
+            # Store in cache
+            cache_key = f"share_link_access_{self.token}"
+            cache.set(cache_key, access_token, timeout=3600)
+
+            return access_token
+
+        except Exception as e:
+            logger.error(f"Token generation error: {str(e)}", exc_info=True)
+            raise
 
     def verify_access_token(self, token):
         """Verify an access token is valid"""
-        if not self.is_valid():
-            return False
+        try:
+            if not self.is_valid():
+                return False
+                
+            # Use the same secret creation method as in generate_access_token
+            secret = hashlib.sha256(settings.SECRET_KEY.encode('utf-8')).hexdigest()
             
-        cache_key = f"share_link_access_{self.token}"
-        stored_token = cache.get(cache_key)
-        
-        return stored_token and stored_token == token
+            payload = jwt.decode(
+                token,
+                secret,
+                algorithms=['HS256']
+            )
+            
+            # Verify this token was generated for this share link
+            return str(self.id) == payload.get('share_link_id')
+            
+        except jwt.ExpiredSignatureError:
+            logger.warning(f"Expired token for share link {self.id}")
+            return False
+        except jwt.InvalidTokenError as e:
+            logger.warning(f"Invalid token for share link {self.id}: {str(e)}")
+            return False
+        except Exception as e:
+            logger.error(f"Token verification error: {str(e)}", exc_info=True)
+            return False
 
     def register_access(self, access_type='view', user=None, ip_address=None):
         """Register an access to the shared file"""
