@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Upload, X, File, AlertCircle } from 'lucide-react';
 import { uploadFile } from '../../../services/api';
+import { generateEncryptionKey, encryptFile } from '../../../utils/encryption';
 
 const FileUploadModal = ({ onClose, onUploadComplete }) => {
     const [file, setFile] = useState(null);

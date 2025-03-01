@@ -289,74 +289,6 @@ class FileViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    # @action(detail=False, methods=['post'], url_path='upload')
-    # def upload_file(self, request):
-    #     try:
-    #         file_obj = request.FILES.get('file')
-    #         if not file_obj:
-    #             return Response(
-    #                 {'error': 'No file provided'},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         # Check file size
-    #         if file_obj.size > settings.MAX_UPLOAD_SIZE:
-    #             return Response({
-    #                 'error': f'File size exceeds limit of {settings.MAX_UPLOAD_SIZE / (1024*1024):.1f} MB'
-    #             }, status=status.HTTP_400_BAD_REQUEST)
-
-    #         # Check quota
-    #         used_storage = File.objects.filter(owner=request.user).aggregate(
-    #             total=Sum('file_size'))['total'] or 0
-    #         if hasattr(settings, 'USER_STORAGE_LIMIT') and used_storage + file_obj.size > settings.USER_STORAGE_LIMIT:
-    #             return Response(
-    #                 {'error': 'Storage quota exceeded'},
-    #                 status=status.HTTP_400_BAD_REQUEST
-    #             )
-
-    #         # Read file content
-    #         file_content = file_obj.read()
-    #         file_obj.seek(0)
-
-    #         original_filename = request.POST.get('original_filename') or file_obj.name
-    #         # Get MIME type
-    #         mime_type = request.POST.get('mime_type') or magic.from_buffer(file_content[:1024], mime=True)
-
-    #         # Generate unique filename
-    #         file_extension = file_obj.name.split('.')[-1] if '.' in file_obj.name else ''
-    #         unique_filename = f"{uuid.uuid4()}.{file_extension}"
-
-    #         # Create file instance
-    #         file_instance = File(
-    #             name=original_filename,
-    #             owner=request.user,
-    #             mime_type=mime_type,
-    #             file_size=file_obj.size
-    #         )
-
-    #         # Calculate checksum before encryption
-    #         file_instance.checksum = file_instance.calculate_checksum(file_content)
-
-    #         # Handle encryption
-    #         file_content = file_instance.encrypt_file_data(file_content)
-
-    #         # Save file
-    #         file_path = default_storage.save(
-    #             f'uploads/{unique_filename}',
-    #             ContentFile(file_content)
-    #         )
-    #         file_instance.file = file_path
-    #         file_instance.save()
-
-    #         serializer = self.get_serializer(file_instance)
-    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-    #     except Exception as e:
-    #         logger.error(f"Upload error: {str(e)}")
-    #         return Response(
-    #             {'error': str(e)},
-    #             status=status.HTTP_500_INTERNAL_SERVER_ERROR
-    #         )
     @action(detail=False, methods=['post'], url_path='upload')
     def upload_file(self, request):
         try:
@@ -366,13 +298,13 @@ class FileViewSet(viewsets.ModelViewSet):
                     {'error': 'No file provided'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-    
+
             # Check file size
             if file_obj.size > settings.MAX_UPLOAD_SIZE:
                 return Response({
                     'error': f'File size exceeds limit of {settings.MAX_UPLOAD_SIZE / (1024*1024):.1f} MB'
                 }, status=status.HTTP_400_BAD_REQUEST)
-    
+
             # Check quota
             used_storage = File.objects.filter(owner=request.user).aggregate(
                 total=Sum('file_size'))['total'] or 0
@@ -381,15 +313,19 @@ class FileViewSet(viewsets.ModelViewSet):
                     {'error': 'Storage quota exceeded'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-    
+
+            # Read file content
+            file_content = file_obj.read()
+            file_obj.seek(0)
+
             original_filename = request.POST.get('original_filename') or file_obj.name
-            mime_type = request.POST.get('mime_type')
-            encryption_key = request.POST.get('encryption_key')  # Get the encryption key
-    
+            # Get MIME type
+            mime_type = request.POST.get('mime_type') or magic.from_buffer(file_content[:1024], mime=True)
+
             # Generate unique filename
             file_extension = file_obj.name.split('.')[-1] if '.' in file_obj.name else ''
             unique_filename = f"{uuid.uuid4()}.{file_extension}"
-    
+
             # Create file instance
             file_instance = File(
                 name=original_filename,
@@ -397,29 +333,24 @@ class FileViewSet(viewsets.ModelViewSet):
                 mime_type=mime_type,
                 file_size=file_obj.size
             )
-    
-            # Store the encryption key if provided
-            if encryption_key:
-                # Convert base64 key to binary
-                raw_key = base64.b64decode(encryption_key)
-                file_instance.encryption_key = raw_key
-    
-            # Calculate checksum
-            file_content = file_obj.read()
-            file_obj.seek(0)
+
+            # Calculate checksum before encryption
             file_instance.checksum = file_instance.calculate_checksum(file_content)
-    
-            # Save the already encrypted file
+
+            # Handle encryption
+            file_content = file_instance.encrypt_file_data(file_content)
+
+            # Save file
             file_path = default_storage.save(
                 f'uploads/{unique_filename}',
                 ContentFile(file_content)
             )
             file_instance.file = file_path
             file_instance.save()
-    
+
             serializer = self.get_serializer(file_instance)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
         except Exception as e:
             logger.error(f"Upload error: {str(e)}")
             return Response(

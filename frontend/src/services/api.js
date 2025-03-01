@@ -1,7 +1,6 @@
 // src/services/api.js
 import axios from 'axios';
 import keycloak from './keycloak';
-import { encryptFile } from '../utils/fileEncryption';
 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -42,60 +41,28 @@ api.interceptors.response.use(
 );
 
 // File operations
-// export const uploadFile = async (file, fileName, mimeType, onProgress) => {
-//     const formData = new FormData();
-//     formData.append('file', file, fileName);
-//     formData.append('original_filename', fileName);
-//     formData.append('mime_type', mimeType);
-//     console.log('MimeType:', mimeType);
-
-//     const response = await api.post('/api/files/upload/', formData, {
-//         headers: {
-//             'Content-Type': 'multipart/form-data',
-//         },
-//         onUploadProgress: (progressEvent) => {
-//             if (onProgress) {
-//                 const percentCompleted = Math.round(
-//                     (progressEvent.loaded * 100) / progressEvent.total
-//                 );
-//                 onProgress(percentCompleted);
-//             }
-//         },
-//     });
-
-//     return response.data;
-// };
-
 export const uploadFile = async (file, fileName, mimeType, onProgress) => {
-    try {
-        // Encrypt the file before upload
-        const { encryptedFile, key } = await encryptFile(file);
-        
-        const formData = new FormData();
-        formData.append('file', encryptedFile, fileName);
-        formData.append('original_filename', fileName);
-        formData.append('mime_type', mimeType);
-        formData.append('encryption_key', key);  // Send the encryption key
+    const formData = new FormData();
+    formData.append('file', file, fileName);
+    formData.append('original_filename', fileName);
+    formData.append('mime_type', mimeType);
+    console.log('MimeType:', mimeType);
 
-        const response = await api.post('/api/files/upload/', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
-            onUploadProgress: (progressEvent) => {
-                if (onProgress) {
-                    const percentCompleted = Math.round(
-                        (progressEvent.loaded * 100) / progressEvent.total
-                    );
-                    onProgress(percentCompleted);
-                }
-            },
-        });
+    const response = await api.post('/api/files/upload/', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+            if (onProgress) {
+                const percentCompleted = Math.round(
+                    (progressEvent.loaded * 100) / progressEvent.total
+                );
+                onProgress(percentCompleted);
+            }
+        },
+    });
 
-        return response.data;
-    } catch (error) {
-        console.error('Upload error:', error);
-        throw error;
-    }
+    return response.data;
 };
 
 export const getFiles = async () => {
