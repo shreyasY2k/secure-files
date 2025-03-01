@@ -23,7 +23,11 @@ const KeycloakProvider = ({ children }) => {
             initOptions={{
                 onLoad: 'check-sso',
                 checkLoginIframe: false,
-                pkceMethod: 'S256'
+                pkceMethod: 'S256',
+                // no nonce in the token
+                enableLogging: true,
+                useNonce: false,
+
             }}
             onEvent={handleEvent}
             LoadingComponent={loadingComponent}

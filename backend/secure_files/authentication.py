@@ -20,11 +20,7 @@ class KeycloakAuthentication(authentication.BaseAuthentication):
             return cached_key
 
         try:
-            well_known_url = f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/.well-known/openid-configuration"
-            well_known = requests.get(well_known_url, verify=False)
-            well_known.raise_for_status()
-            
-            jwks_uri = well_known.json()['jwks_uri']
+            jwks_uri = f"{settings.KEYCLOAK_URL}/realms/{settings.KEYCLOAK_REALM}/protocol/openid-connect/certs"
             keys_response = requests.get(jwks_uri, verify=False)
             keys_response.raise_for_status()
             keys = keys_response.json()

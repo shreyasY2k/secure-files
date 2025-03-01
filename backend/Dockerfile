@@ -60,5 +60,5 @@ CMD set -e \
     && echo "Starting Gunicorn server..." \
     && exec gunicorn secure_files.wsgi:application \
         --bind 0.0.0.0:3002 \
-        --workers 3 \
+        --workers 2 \
         --timeout 120

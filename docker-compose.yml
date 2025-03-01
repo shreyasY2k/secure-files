@@ -1,8 +1,6 @@
 services:
   cert-generator:
-    build:
-      context: .
-      dockerfile: cert-generator.Dockerfile
+    build: ./cert-generator
     volumes:
       - ./certs:/certs
 
@@ -24,7 +22,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     env_file:
-      - frontend.env
+      - ./frontend/.env
     depends_on:
       - nginx
 
@@ -37,20 +35,22 @@ services:
       - file-storage:/app/storage
       - log-storage:/app/logs
     env_file:
-      - backend.env
+      - ./backend/.env
     depends_on:
       - nginx
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0.2
+    image: quay.io/keycloak/keycloak:26.1.2
     env_file:
-      - keycloak.env
+      - ./keycloak/.env
     volumes:
+      # Mount both themes
       - ./keycloak/themes/secure-files:/opt/keycloak/themes/secure-files:ro
+      # Mount the custom MFA provider jar
+      - ./target/keycloak-mfa-plugin-1.0-SNAPSHOT.jar:/opt/keycloak/providers/keycloak-mfa-plugin-1.0-SNAPSHOT.jar:ro
     depends_on:
       - nginx
       - db
-    
     command:
       - start-dev
 
@@ -59,19 +59,22 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     env_file:
-      - db.env
+      - ./db/.env
 
   keycloak-init:
     build:
-      context: .
-      dockerfile: keycloak-init.Dockerfile
+      context: ./keycloak-init
     env_file:
-      - keycloak-init.env
-    networks:
-      - default
+      - ./keycloak-init/.env
     depends_on:
       keycloak:
         condition: service_started
+
+  telegram-bot:
+    build: ./telegram-bot
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+    restart: unless-stopped
 
 volumes:
   ssl-certs:

@@ -21,7 +21,6 @@ backend/*.egg-info/
 backend/.installed.cfg
 backend/*.egg
 backend/MANIFEST
-backend/.env
 backend/venv/
 backend/ENV/
 backend/*.log
@@ -69,7 +68,6 @@ certs/*
 *.swp
 *.swo
 .DS_Store
-.env
 venv/
 
 # Keep these files
