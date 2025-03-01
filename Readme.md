@@ -30,50 +30,29 @@ Prerequisites
 - Modern web browser
 - Git
 
-Project Structure
-
-```tree
-secure-files/
-├── backend/          # Django backend
-├── frontend/         # React frontend
-├── keycloak/         # Keycloak configuration
-├── nginx/           # Nginx configuration
-│   ├── nginx.conf   # Nginx configuration file
-│   └── ssl/        # SSL certificates directory
-├── certs/           # Generated SSL certificates
-├── docker-compose.yml
-├── backend.env
-├── frontend.env
-├── keycloak.env
-├── db.env
-├── cert-generator.Dockerfile  # Dockerfile for SSL certificate generation
-├── generate-certs.sh         # Script to generate SSL certificates
-├── init_keycloak.py
-├── keycloak-init.Dockerfile
-├── requirements-init.txt
-├── realm-config.json
-├── .gitignore
-└── README.md
-```
-
 Quick Start
 
 1. Clone the repository:
+
 ```bash
    git clone https://github.com/shreyasY2k/secure-files
    cd secure-files
 ```
+
 2. Start the services:
+
 ```bash
    docker compose up --build
 ```
+
    This command will:
 
-   - Build and start all necessary containers
-   - Generate SSL certificates automatically
-   - Initialize Keycloak with default realms and users
-   - Set up the database
-   - Start the frontend and backend services with SSL enabled
+- Build and start all necessary containers
+- Generate SSL certificates automatically
+- Initialize Keycloak with default realms and users
+- Set up the database
+- Start the frontend and backend services with SSL enabled
+
 3. Install the SSL certificate:
 
    For Windows:
@@ -89,6 +68,7 @@ Quick Start
    - Restart your browser
 
    For Linux/Ubuntu:
+
    ```bash
    sudo cp certs/localhost.crt /usr/local/share/ca-certificates/
    sudo update-ca-certificates
@@ -161,7 +141,7 @@ Security (Keycloak) 🛡️
 
 - OAuth 2.0 / OpenID Connect
 - Role-based access control
-- TOTP Enabled
+- TOTP, SMS, Email and Telegram MFA
 - Customizable authentication flows
 
 SSL/HTTPS (Nginx + OpenSSL) 🔒
@@ -177,12 +157,14 @@ Common Issues
 
 1. Docker Image Pull Issues 🐳
    Some base images might fail to pull automatically. If you encounter pull errors, try manually pulling these images first:
+
    ```bash
    docker pull python:3.9-slim
    docker pull node:18-slim
    docker pull postgres:13
    docker pull quay.io/keycloak/keycloak:24.0.2
    ```
+
    Then run docker-compose up --build again.
 2. Keycloak Connection Issues 🔌
 
