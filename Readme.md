@@ -151,6 +151,13 @@ SSL/HTTPS (Nginx + OpenSSL) 🔒
 - Single point SSL termination
 - Path-based routing for all services
 
+## Screenshots 📸
+![Login Page](resources/login.png)
+![Select MFA Method](resources/select-mfa.png)
+![Email Code](resources/email-code.png)
+![Enter Code](resources/mfa-code.png)
+![Dashboard](resources/dashboard.png)
+
 Troubleshooting 🔧
 
 Common Issues
