@@ -33,7 +33,7 @@ prometheus-client==0.17.1
 python-dotenv==1.0.0
 
 # WSGI Server
-gunicorn==21.2.0
+gunicorn==22.0.0
 
 # HTTP and Networking
 requests==2.31.0
