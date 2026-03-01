@@ -16,7 +16,7 @@ bcrypt==4.0.1
 argon2-cffi==23.1.0
 
 # File Handling and Storage
-Pillow==10.1.0
+Pillow==12.1.1
 django-storages==1.14.2
 boto3==1.29.3
 python-magic==0.4.27
